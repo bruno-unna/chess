@@ -1,13 +1,14 @@
 //#full-example
-package com.example
+package org.chess
 
-import org.scalatest.{ BeforeAndAfterAll, WordSpecLike, Matchers }
 import akka.actor.ActorSystem
-import akka.testkit.{ TestKit, TestProbe }
+import akka.testkit.{TestKit, TestProbe}
+import org.chess.Greeter._
+import org.chess.Printer.Greeting
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import Greeter._
-import Printer._
 
 //#test-classes
 class AkkaQuickstartSpec(_system: ActorSystem)

@@ -1,7 +1,7 @@
 //#full-example
-package com.example
+package org.chess
 
-import akka.actor.{ Actor, ActorLogging, ActorRef, ActorSystem, Props }
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 
 //#greeter-companion
 //#greeter-messages
