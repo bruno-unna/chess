@@ -1,9 +1,9 @@
 package org.chess
 
-import akka.actor.{LoggingFSM, Props}
-import org.chess.UCICommands.{Quit, UCI}
+import akka.actor.{Actor, ActorLogging, ActorRef, LoggingFSM, Props}
+import org.chess.UCICommands.{Nop, Quit, UCI}
 
-import scala.io.StdIn
+import scala.io.{Source, StdIn}
 
 // received events
 case object Start
@@ -27,7 +27,7 @@ object UCICommands {
     if (input == null) return Nop
     val inputStream = input.split("\\s+").toList.dropWhile(UCICommands.fromString(_).isDefined)
     if (inputStream.isEmpty) return Nop
-    fromString(inputStream.head).getOrElse(Nop)
+    Nop
   }
 }
 
@@ -55,6 +55,7 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
 
   when(Idle) {
     case Event(Start, _) =>
+      context.actorOf(LineReader.props(self)) ! Start
       goto(Ready)
   }
 
@@ -104,4 +105,23 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
 
 object UCIInterpreter {
   val props: Props = Props(new UCIInterpreter)
+}
+
+class LineReader(interpreter: ActorRef) extends Actor with ActorLogging {
+  override def receive: PartialFunction[Any, Unit] = {
+    case Start =>
+      for (ln <- Source.stdin.getLines().map { line =>
+        log.debug("received input \"{}\" from user", line)
+        val command = UCICommands.fromString(line).getOrElse(Nop)
+        log.debug("translated input to command {}", command.toString)
+        interpreter ! command
+        command
+      }.takeWhile(_ != Quit)) { cmd: UCICommands.Command => log.debug("processed command") }
+      interpreter ! Quit
+      context stop self
+  }
+}
+
+object LineReader {
+  def props(interpreter: ActorRef) = Props(new LineReader(interpreter))
 }
