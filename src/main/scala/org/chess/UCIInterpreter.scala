@@ -3,7 +3,7 @@ package org.chess
 import akka.actor.{Actor, ActorLogging, ActorRef, LoggingFSM, Props}
 import org.chess.UCICommands.{Nop, Quit, UCI}
 
-import scala.io.{Source, StdIn}
+import scala.io.Source
 
 // received events
 case object Start
@@ -20,14 +20,15 @@ object UCICommands {
 
   val commands = Seq(UCI, Quit, Nop)
 
-  def fromString(string: String): Option[Command] = commands.find(_.name == string.toLowerCase)
-
-  def fetchCommand: UCICommands.Command = {
-    lazy val input = StdIn.readLine()
-    if (input == null) return Nop
-    val inputStream = input.split("\\s+").toList.dropWhile(UCICommands.fromString(_).isDefined)
-    if (inputStream.isEmpty) return Nop
-    Nop
+  def fromString(string: String): Option[Command] = {
+    val words = string.split("\\s+").toList.dropWhile(word =>
+      !commands.exists(cmd => cmd.name == word.toLowerCase))
+    words match {
+      case Nil =>
+        None
+      case first :: rest =>
+        commands.find(cmd => cmd.name == first.toLowerCase)
+    }
   }
 }
 
@@ -88,13 +89,12 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
     case Ready -> UCIMode =>
       println(s"id name Chess 0.1.0")
       println(s"id author Bruno Unna")
-      println("option name Ponder type check")
+      println("option name Ponder type check default true")
       println("option name OwnBook type check default false")
       println("option name UCI_EngineAbout type string " +
         "default Chess by Bruno Unna, " +
         "see https://gitlab.com/bruno.unna/chess")
       println("uciok")
-      self ! UCICommands.fetchCommand
     case _ -> Dead =>
       context stop self
       context.system.terminate()
@@ -110,13 +110,13 @@ object UCIInterpreter {
 class LineReader(interpreter: ActorRef) extends Actor with ActorLogging {
   override def receive: PartialFunction[Any, Unit] = {
     case Start =>
-      for (ln <- Source.stdin.getLines().map { line =>
-        log.debug("received input \"{}\" from user", line)
+      for (command <- Source.stdin.getLines().map { line =>
         val command = UCICommands.fromString(line).getOrElse(Nop)
-        log.debug("translated input to command {}", command.toString)
         interpreter ! command
         command
-      }.takeWhile(_ != Quit)) { cmd: UCICommands.Command => log.debug("processed command") }
+      }.takeWhile(_ != Quit)) {
+        log.debug("processing command {}", command.toString)
+      }
       interpreter ! Quit
       context stop self
   }
