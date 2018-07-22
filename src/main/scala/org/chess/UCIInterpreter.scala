@@ -1,7 +1,7 @@
 package org.chess
 
 import akka.actor.{Actor, ActorLogging, ActorRef, LoggingFSM, Props}
-import org.chess.UCICommands.{Nop, Quit, UCI}
+import org.chess.UCICommands.{Quit, UCI}
 
 import scala.io.Source
 
@@ -16,18 +16,16 @@ object UCICommands {
 
   case object Quit extends Command("quit")
 
-  case object Nop extends Command("")
-
-  val commands = Seq(UCI, Quit, Nop)
+  val commands = Seq(UCI, Quit)
 
   def fromString(string: String): Option[Command] = {
     val words = string.split("\\s+").toList.dropWhile(word =>
       !commands.exists(cmd => cmd.name == word.toLowerCase))
     words match {
-      case Nil =>
-        None
       case first :: rest =>
         commands.find(cmd => cmd.name == first.toLowerCase)
+      case _ =>
+        None
     }
   }
 }
@@ -72,7 +70,7 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
   }
 
   when(Dead) {
-    case Event(event, data) =>
+    case Event(event, _) =>
       log.warning("in Dead state, impossible event {} was received", event.toString)
       stay
   }
@@ -110,12 +108,8 @@ object UCIInterpreter {
 class LineReader(interpreter: ActorRef) extends Actor with ActorLogging {
   override def receive: PartialFunction[Any, Unit] = {
     case Start =>
-      for (command <- Source.stdin.getLines().map { line =>
-        val command = UCICommands.fromString(line).getOrElse(Nop)
+      for (command <- Source.stdin.getLines().map(UCICommands.fromString).filter(_.isDefined).map(_.get).takeWhile(_ != Quit)) {
         interpreter ! command
-        command
-      }.takeWhile(_ != Quit)) {
-        log.debug("processing command {}", command.toString)
       }
       interpreter ! Quit
       context stop self
