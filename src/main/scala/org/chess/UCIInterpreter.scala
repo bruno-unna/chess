@@ -1,8 +1,6 @@
 package org.chess
 
-import akka.actor.{Actor, ActorLogging, ActorRef, LoggingFSM, Props}
-
-import scala.io.Source
+import akka.actor.{LoggingFSM, Props}
 
 // received events (including commands)
 case object Start
@@ -57,7 +55,6 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
 
   when(Idle) {
     case Event(Start, _) =>
-      context.actorOf(LineReader.props(self)) ! Start
       goto(Ready)
   }
 
@@ -106,25 +103,4 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
 
 object UCIInterpreter {
   val props: Props = Props(new UCIInterpreter)
-}
-
-class LineReader(interpreter: ActorRef) extends Actor with ActorLogging {
-  override def receive: PartialFunction[Any, Unit] = {
-    case Start =>
-      // A stream of (possibly) human interaction, the functional way:
-      for (command <- Source.stdin.getLines(). // raw strings
-        map(Command.fromString). // converted to commands
-        filter(_.isDefined). // but only if actual commands!
-        map(_.get). // extract the command from the Option
-        takeWhile(_.keyword != Quit) // until a Quit command arrives
-      ) interpreter ! command
-
-      // Out of the loop already? Let's quit!
-      interpreter ! Command(Quit, Nil)
-      context stop self
-  }
-}
-
-object LineReader {
-  def props(interpreter: ActorRef) = Props(new LineReader(interpreter))
 }
