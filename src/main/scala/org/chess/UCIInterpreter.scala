@@ -108,9 +108,15 @@ object UCIInterpreter {
 class LineReader(interpreter: ActorRef) extends Actor with ActorLogging {
   override def receive: PartialFunction[Any, Unit] = {
     case Start =>
-      for (command <- Source.stdin.getLines().map(UCICommands.fromString).filter(_.isDefined).map(_.get).takeWhile(_ != Quit)) {
-        interpreter ! command
-      }
+      // A stream of (possibly) human interaction, the functional way:
+      for (command <- Source.stdin.getLines().  // raw strings
+        map(UCICommands.fromString).  // converted to commands
+        filter(_.isDefined).  // but only if actual commands!
+        map(_.get). // extract the command from the Option
+        takeWhile(_ != Quit)  // until a Quit command arrives
+      ) interpreter ! command
+
+      // Out of the loop already? Let's quit!
       interpreter ! Quit
       context stop self
   }
