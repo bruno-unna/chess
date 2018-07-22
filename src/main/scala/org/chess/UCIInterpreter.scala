@@ -1,29 +1,32 @@
 package org.chess
 
 import akka.actor.{Actor, ActorLogging, ActorRef, LoggingFSM, Props}
-import org.chess.UCICommands.{Quit, UCI}
 
 import scala.io.Source
 
-// received events
+// received events (including commands)
 case object Start
 
-object UCICommands {
+sealed abstract class Keyword(val name: String)
 
-  sealed abstract class Command(val name: String)
+case object UCI extends Keyword("uci")
 
-  case object UCI extends Command("uci")
+case object Quit extends Keyword("quit")
 
-  case object Quit extends Command("quit")
+case object Debug extends Keyword("debug")
 
-  val commands = Seq(UCI, Quit)
+case class Command(keyword: Keyword, args: List[String])
+
+object Command {
+
+  val keywords: Seq[Keyword] = Seq(UCI, Quit, Debug)
 
   def fromString(string: String): Option[Command] = {
-    val words = string.split("\\s+").toList.dropWhile(word =>
-      !commands.exists(cmd => cmd.name == word.toLowerCase))
+    val words = string.split("\\s+").toList.
+      dropWhile(word => !keywords.exists(_.name == word.toLowerCase))
     words match {
-      case first :: rest =>
-        commands.find(cmd => cmd.name == first.toLowerCase)
+      case keyword :: arguments =>
+        keywords.find(_.name == keyword.toLowerCase).map(Command(_, arguments))
       case _ =>
         None
     }
@@ -59,13 +62,13 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
   }
 
   when(Ready) {
-    case Event(UCI, _) =>
+    case Event(Command(UCI, _), _) =>
       goto(UCIMode) using Options(ponder = true, ownBook = false)
   }
 
   when(UCIMode) {
     // TODO provide handlers for all possible commands
-    case Event(event, data) if event != Quit =>
+    case Event(Command(keyword, _), _) if keyword != Quit =>
       stay
   }
 
@@ -76,7 +79,7 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
   }
 
   whenUnhandled {
-    case Event(Quit, _) =>
+    case Event(Command(Quit, _), _) =>
       goto(Dead)
     case Event(event, data) =>
       log.warning("in state {}, received unhandled event {} with data {}", stateName, event.toString, data.toString)
@@ -109,15 +112,15 @@ class LineReader(interpreter: ActorRef) extends Actor with ActorLogging {
   override def receive: PartialFunction[Any, Unit] = {
     case Start =>
       // A stream of (possibly) human interaction, the functional way:
-      for (command <- Source.stdin.getLines().  // raw strings
-        map(UCICommands.fromString).  // converted to commands
-        filter(_.isDefined).  // but only if actual commands!
+      for (command <- Source.stdin.getLines(). // raw strings
+        map(Command.fromString). // converted to commands
+        filter(_.isDefined). // but only if actual commands!
         map(_.get). // extract the command from the Option
-        takeWhile(_ != Quit)  // until a Quit command arrives
+        takeWhile(_.keyword != Quit) // until a Quit command arrives
       ) interpreter ! command
 
       // Out of the loop already? Let's quit!
-      interpreter ! Quit
+      interpreter ! Command(Quit, Nil)
       context stop self
   }
 }
