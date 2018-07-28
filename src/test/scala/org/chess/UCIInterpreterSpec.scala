@@ -2,6 +2,7 @@ package org.chess
 
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
+import org.chess.Keyword.Quit
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
 import scala.concurrent.duration._

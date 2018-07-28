@@ -1,30 +1,38 @@
 package org.chess
 
 import akka.actor.{LoggingFSM, Props}
+import enumeratum._
+
+import scala.collection.immutable
+
+sealed trait Keyword extends EnumEntry
+
+object Keyword extends Enum[Keyword] {
+  override def values: immutable.IndexedSeq[Keyword] = findValues
+
+  case object UCI extends Keyword
+
+  case object Quit extends Keyword
+
+  case object Debug extends Keyword
+
+  case object SetOption extends Keyword
+
+}
 
 // received events (including commands)
 case object Start
-
-sealed abstract class Keyword(val name: String)
-
-case object UCI extends Keyword("uci")
-
-case object Quit extends Keyword("quit")
-
-case object Debug extends Keyword("debug")
 
 case class Command(keyword: Keyword, args: List[String])
 
 object Command {
 
-  val keywords: Seq[Keyword] = Seq(UCI, Quit, Debug)
-
   def fromString(string: String): Option[Command] = {
     val words = string.split("\\s+").toList.
-      dropWhile(word => !keywords.exists(_.name == word.toLowerCase))
+      dropWhile(Keyword.withNameInsensitiveOption(_).isEmpty)
     words match {
       case keyword :: arguments =>
-        keywords.find(_.name == keyword.toLowerCase).map(Command(_, arguments))
+        Keyword.withNameInsensitiveOption(keyword).map(Command(_, arguments))
       case _ =>
         None
     }
@@ -43,15 +51,13 @@ case object UCIMode extends State
 case object Dead extends State
 
 // internal data
-sealed trait Data
+case class Options(ponder: Boolean, ownBook: Boolean, debug: Boolean)
 
-case object Uninitialised extends Data
+import org.chess.Keyword._
 
-final case class Options(ponder: Boolean, ownBook: Boolean) extends Data
+class UCIInterpreter extends LoggingFSM[State, Options] {
 
-class UCIInterpreter extends LoggingFSM[State, Data] {
-
-  startWith(Idle, Uninitialised)
+  startWith(Idle, Options(ponder = true, ownBook = false, debug = false))
 
   when(Idle) {
     case Event(Start, _) =>
@@ -60,12 +66,12 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
 
   when(Ready) {
     case Event(Command(UCI, _), _) =>
-      goto(UCIMode) using Options(ponder = true, ownBook = false)
+      goto(UCIMode)
   }
 
   when(UCIMode) {
     // TODO provide handlers for all possible commands
-    case Event(Command(keyword, _), _) if keyword != Quit =>
+    case Event(Command(SetOption, _), _) =>
       stay
   }
 
@@ -75,11 +81,15 @@ class UCIInterpreter extends LoggingFSM[State, Data] {
       stay
   }
 
+  // Use this for all messages that should be available always
   whenUnhandled {
     case Event(Command(Quit, _), _) =>
       goto(Dead)
-    case Event(event, data) =>
-      log.warning("in state {}, received unhandled event {} with data {}", stateName, event.toString, data.toString)
+    case Event(Command(Debug, args), options) =>
+      stay using options.copy(debug = args.exists(_.toLowerCase == "on"))
+    case Event(event, data) if event.isInstanceOf[Command] =>
+      log.warning("while in state {}, received unhandled event {} with data {}",
+        stateName, event.toString, data.toString)
       stay
   }
 

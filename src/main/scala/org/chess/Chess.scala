@@ -1,6 +1,7 @@
 package org.chess
 
 import akka.actor.{ActorRef, ActorSystem}
+import org.chess.Keyword.Quit
 
 import scala.io.Source
 
