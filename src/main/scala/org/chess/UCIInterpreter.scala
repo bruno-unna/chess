@@ -86,7 +86,12 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
     case Event(Command(Quit, _), _) =>
       goto(Dead)
     case Event(Command(Debug, args), options) =>
-      stay using options.copy(debug = args.exists(_.toLowerCase == "on"))
+      if (args.exists(_.toLowerCase == "on")) stay using options.copy(debug = true)
+      else if (args.exists(_.toLowerCase == "off")) stay using options.copy(debug = false)
+      else {
+        log.warning("invalid input to command debug (should be on or off)")
+        stay
+      }
     case Event(event, data) if event.isInstanceOf[Command] =>
       log.warning("while in state {}, received unhandled event {} with data {}",
         stateName, event.toString, data.toString)
