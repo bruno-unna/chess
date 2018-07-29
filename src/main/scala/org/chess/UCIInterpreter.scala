@@ -168,5 +168,6 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
 
 /** Provides the `Props` for the instantiation of the FSM. */
 object UCIInterpreter {
+  /** `Props` object to ease the creation of the FSM. */
   val props: Props = Props(new UCIInterpreter)
 }
