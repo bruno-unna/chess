@@ -8,17 +8,30 @@ import scala.collection.immutable
 sealed trait Keyword extends EnumEntry
 
 object Keyword extends Enum[Keyword] {
-  override def values: immutable.IndexedSeq[Keyword] = findValues
 
   case object UCI extends Keyword
 
-  case object Quit extends Keyword
-
   case object Debug extends Keyword
+
+  case object IsReady extends Keyword
 
   case object SetOption extends Keyword
 
-  case object IsReady extends Keyword
+  case object Register extends Keyword
+
+  case object UCINewGame extends Keyword
+
+  case object Position extends Keyword
+
+  case object Go extends Keyword
+
+  case object Stop extends Keyword
+
+  case object PonderHit extends Keyword
+
+  case object Quit extends Keyword
+
+  override def values: immutable.IndexedSeq[Keyword] = findValues
 
 }
 
@@ -42,20 +55,27 @@ object Command {
 }
 
 // possible states
-sealed trait State
+sealed trait State extends EnumEntry
 
-case object Idle extends State
+object State extends Enum[State] {
 
-case object Ready extends State
+  case object Idle extends State
 
-case object UCIMode extends State
+  case object Ready extends State
 
-case object Dead extends State
+  case object UCIMode extends State
+
+  case object Dead extends State
+
+  override def values: immutable.IndexedSeq[State] = findValues
+
+}
 
 // internal data
 case class Options(ponder: Boolean, ownBook: Boolean, debug: Boolean)
 
 import org.chess.Keyword._
+import org.chess.State._
 
 class UCIInterpreter extends LoggingFSM[State, Options] {
 
