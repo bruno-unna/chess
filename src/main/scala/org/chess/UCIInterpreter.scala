@@ -78,7 +78,7 @@ object State extends Enum[State] {
 
   case object Ready extends State
 
-  case object UCIMode extends State
+  case object Waiting extends State
 
   case object Dead extends State
 
@@ -113,10 +113,10 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
 
   when(Ready) {
     case Event(Command(UCI, _), _) =>
-      goto(UCIMode)
+      goto(Waiting)
   }
 
-  when(UCIMode) {
+  when(Waiting) {
     // TODO provide handlers for all possible commands
     case Event(Command(SetOption, _), _) =>
       stay
@@ -149,7 +149,7 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
   }
 
   onTransition {
-    case Ready -> UCIMode =>
+    case Ready -> Waiting =>
       println(s"id name Chess 0.1.0")
       println(s"id author Bruno Unna")
       println("option name Ponder type check default true")
