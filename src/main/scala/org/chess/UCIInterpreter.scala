@@ -120,6 +120,9 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
     // TODO provide handlers for all possible commands
     case Event(Command(SetOption, _), _) =>
       stay
+    case Event(Command(IsReady, _), _) =>
+      println("readyok")
+      stay
   }
 
   when(Dead) {
