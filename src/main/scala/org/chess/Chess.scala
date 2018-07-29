@@ -5,6 +5,13 @@ import org.chess.Keyword.Quit
 
 import scala.io.Source
 
+/** Entry point of the application.
+  *
+  * Responsibilities of this object are:
+  * - Initialising the actor system for the UCI protocol FSM.
+  * - Reading from the `stdin` (as per the protocol) and sending valid commands to the FSM.
+  * - Signal the FSM to quit when the moment to do so comes (quit command).
+  */
 object Chess extends App {
   val system: ActorSystem = ActorSystem("chess")
 
