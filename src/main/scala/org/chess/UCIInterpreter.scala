@@ -18,6 +18,8 @@ object Keyword extends Enum[Keyword] {
 
   case object SetOption extends Keyword
 
+  case object IsReady extends Keyword
+
 }
 
 // received events (including commands)
@@ -92,6 +94,9 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
         log.warning("invalid input to command debug (should be on or off)")
         stay
       }
+    case Event(Command(IsReady, _), _) =>
+      log.error("command isReady is not handled in state {} but should", stateName)
+      stay
     case Event(event, data) if event.isInstanceOf[Command] =>
       log.warning("while in state {}, received unhandled event {} with data {}",
         stateName, event.toString, data.toString)
