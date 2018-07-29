@@ -5,8 +5,13 @@ import enumeratum._
 
 import scala.collection.immutable
 
+/** Kick-off event, used to signal the start of operation for the FSM. */
+case object Start
+
+/** Base trait of the [[org.chess.Keyword]] enumeration. */
 sealed trait Keyword extends EnumEntry
 
+/** Enumeration for all possible keywords of the UCI protocol. */
 object Keyword extends Enum[Keyword] {
 
   case object UCI extends Keyword
@@ -35,13 +40,23 @@ object Keyword extends Enum[Keyword] {
 
 }
 
-// received events (including commands)
-case object Start
-
+/** Wrapper around the [[org.chess.Keyword]] sent from the GUI to the engine, that includes
+  * the arguments of the command as a `List[String]`.
+  *
+  * @param keyword keyword sent by the GUI after having been understood as such
+  *                (i.e. this is an entry of an enumeration, not a `String`)
+  * @param args    arguments to the command as passed by the GUI
+  */
 case class Command(keyword: Keyword, args: List[String])
 
+/** Contains utility methods for the [[org.chess.Command]] case class. */
 object Command {
 
+  /** Creates an optional instance of [[org.chess.Command]], given a string (as passed by the GUI).
+    *
+    * @param string what the GUI sends
+    * @return `Some[Command]` if the string can be parsed as such, `None` otherwise
+    */
   def fromString(string: String): Option[Command] = {
     val words = string.split("\\s+").toList.
       dropWhile(Keyword.withNameInsensitiveOption(_).isEmpty)
@@ -54,9 +69,9 @@ object Command {
   }
 }
 
-// possible states
 sealed trait State extends EnumEntry
 
+/** Enumeration for all possible [[org.chess.State]]s of the FSM. */
 object State extends Enum[State] {
 
   case object Idle extends State
@@ -71,12 +86,22 @@ object State extends Enum[State] {
 
 }
 
-// internal data
+/** Data held by the FSM when transitioning between [[org.chess.State]]s. */
 case class Options(ponder: Boolean, ownBook: Boolean, debug: Boolean)
 
 import org.chess.Keyword._
 import org.chess.State._
 
+/** Finite states machine for interpreting the UCI protocol.
+  *
+  * The machine starts in the [[org.chess.State.Idle]] state, from which only
+  * the [[org.chess.Start]] event can provoke a transition (to
+  * [[org.chess.State.Ready]]).
+  *
+  * The operational data of the machine is the [[org.chess.Options]] case
+  * class, that holds all options that can be changed, usually by means
+  * of the [[org.chess.Keyword.SetOption]] event.
+  */
 class UCIInterpreter extends LoggingFSM[State, Options] {
 
   startWith(Idle, Options(ponder = true, ownBook = false, debug = false))
@@ -141,6 +166,7 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
   initialize
 }
 
+/** Provides the `Props` for the instantiation of the FSM. */
 object UCIInterpreter {
   val props: Props = Props(new UCIInterpreter)
 }
