@@ -30,7 +30,7 @@ class UCIInterpreterSpec(_system: ActorSystem)
       testProbe.expectTerminated(interpreter, 3 seconds)
     }
 
-    // TODO add more unit tests (but don't how how to test this, if all output goes to stdout!)
+    // TODO add more unit tests (but don't know how to test this, if all output goes to stdout!)
   }
 
 }
