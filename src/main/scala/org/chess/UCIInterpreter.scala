@@ -153,10 +153,10 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
 
   onTransition {
     case Ready -> Waiting =>
-      println(s"id name Chess 0.1.0")
-      println(s"id author Bruno Unna")
-      println("option name Ponder type check default true")
-      println("option name OwnBook type check default false")
+      println("id name Chess 0.1.0")
+      println("id author Bruno Unna")
+      println(s"option name Ponder type check default ${stateData.ponder}")
+      println(s"option name OwnBook type check default ${stateData.ownBook}")
       println("option name UCI_EngineAbout type string " +
         "default Chess by Bruno Unna, " +
         "see https://gitlab.com/bruno.unna/chess")
