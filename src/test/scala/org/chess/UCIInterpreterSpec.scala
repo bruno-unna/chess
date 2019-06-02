@@ -17,6 +17,7 @@ class UCIInterpreterSpec(_system: ActorSystem)
   def this() = this(ActorSystem("UCIInterpreterSpec"))
 
   override def afterAll: Unit = {
+    super.afterAll()
     shutdown(system)
   }
 
@@ -30,7 +31,6 @@ class UCIInterpreterSpec(_system: ActorSystem)
       testProbe.expectTerminated(interpreter, 3 seconds)
     }
 
-    // TODO add more unit tests (but don't know how to test this, if all output goes to stdout!)
   }
 
 }
