@@ -3,7 +3,8 @@ package org.chess
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
 import org.chess.Keyword.Quit
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{BeforeAndAfterAll, Matchers}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -11,7 +12,7 @@ import scala.language.postfixOps
 class UCIInterpreterSpec(_system: ActorSystem)
   extends TestKit(_system)
     with Matchers
-    with WordSpecLike
+    with AnyWordSpecLike
     with BeforeAndAfterAll {
 
   def this() = this(ActorSystem("UCIInterpreterSpec"))
