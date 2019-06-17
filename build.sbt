@@ -14,3 +14,5 @@ libraryDependencies ++= Seq(
   "com.beachape" %% "enumeratum" % enumeratumVersion,
   "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
 )
+
+enablePlugins(JavaAppPackaging)
