@@ -220,17 +220,13 @@ These are all the command the engine gets from the interface.
 
 * `uciok`
 
-	Must be sent after the id and optional options to tell the GUI that the engine
-	has sent all infos and is ready in uci mode.
+	Must be sent after the id and optional options to tell the GUI that the engine has sent all infos and is ready in uci mode.
 
 * `readyok`
 
-	This must be sent when the engine has received an `isready` command and has
-	processed all input and is ready to accept new commands now.
+	This must be sent when the engine has received an `isready` command and has processed all input and is ready to accept new commands now.
 
-	It is usually sent after a command that can take some time to be able to wait for the engine,
-	but it can be used anytime, even when the engine is searching,
-	and must always be answered with `isready`.
+	It is usually sent after a command that can take some time to be able to wait for the engine, but it can be used anytime, even when the engine is searching, and must always be answered with `isready`.
 
 * `bestmove <move1> [ ponder <move2> ]`
 
@@ -238,23 +234,19 @@ These are all the command the engine gets from the interface.
 
 	The engine can send the move it likes to ponder on. The engine must not start pondering automatically.
 
-	This command must always be sent if the engine stops searching, also in pondering mode if there is a
-	`stop` command, so for every `go` command a `bestmove` command is needed!
+	This command must always be sent if the engine stops searching, also in pondering mode if there is a `stop` command, so for every `go` command a `bestmove` command is needed!
 
-	Directly before that the engine should send a final `info` command with the final search information,
-	the the GUI has the complete statistics about the last search.
+	Directly before that the engine should send a final `info` command with the final search information, the the GUI has the complete statistics about the last search.
 
 * `copyprotection`
 
-	this is needed for copyprotected engines. After the uciok command the engine can tell the GUI,
-	that it will check the copy protection now. This is done by `copyprotection checking`.
+	this is needed for copyprotected engines. After the uciok command the engine can tell the GUI, that it will check the copy protection now. This is done by `copyprotection checking`.
 
 	If the check is ok the engine should send `copyprotection ok`, otherwise `copyprotection error`.
 
 	If there is an error the engine should not function properly but should not quit alone.
 
-	If the engine reports `copyprotection error` the GUI should not use this engine
-	and display an error message instead!
+	If the engine reports `copyprotection error` the GUI should not use this engine and display an error message instead!
 
 	The code in the engine can look like this
 
@@ -269,39 +261,25 @@ These are all the command the engine gets from the interface.
 
 	this is needed for engines that need a username and/or a code to function with all features.
 
-	Analog to the `copyprotection` command the engine can send `registration checking`
-	after the uciok command followed by either `registration ok` or `registration error`.
+	Analog to the `copyprotection` command the engine can send `registration checking` after the uciok command followed by either `registration ok` or `registration error`.
 
-	Also after every attempt to register the engine it should answer with `registration checking`
-	and then either `registration ok` or `registration error`.
+	Also after every attempt to register the engine it should answer with `registration checking` and then either `registration ok` or `registration error`.
 
-	In contrast to the `copyprotection` command, the GUI can use the engine after the engine has
-	reported an error, but should inform the user that the engine is not properly registered
-	and might not use all its features.
+	In contrast to the `copyprotection` command, the GUI can use the engine after the engine has reported an error, but should inform the user that the engine is not properly registered and might not use all its features.
 
-	In addition the GUI should offer to open a dialog to
-	enable registration of the engine. To try to register an engine the GUI can send
-	the `register` command.
+	In addition the GUI should offer to open a dialog to enable registration of the engine. To try to register an engine the GUI can send the `register` command.
 
-	The GUI has to always answer with the `register` command	if the engine sends `registration error`
-	at engine startup (this can also be done with `register later`)
-	and tell the user somehow that the engine is not registered.
-	This way the engine knows that the GUI can deal with the registration procedure and the user
-	will be informed that the engine is not properly registered.
+	The GUI has to always answer with the `register` command	if the engine sends `registration error` at engine startup (this can also be done with `register later`) and tell the user somehow that the engine is not registered. This way the engine knows that the GUI can deal with the registration procedure and the user will be informed that the engine is not properly registered.
 	      
 * `info`
 
 	the engine wants to send information to the GUI. This should be done whenever one of the info has changed.
 
-	The engine can send only selected infos or multiple infos with one info command,
-	e.g. `info currmove e2e4 currmovenumber 1` or
-	     `info depth 12 nodes 123456 nps 100000`.
+	The engine can send only selected infos or multiple infos with one info command, e.g. `info currmove e2e4 currmovenumber 1` or `info depth 12 nodes 123456 nps 100000`.
 
-	Also all infos belonging to the pv should be sent together
-	e.g. `info depth 2 score cp 214 time 1242 nodes 2124 nps 34928 pv e2e4 e7e5 g1f3`
+	Also all infos belonging to the pv should be sent together e.g. `info depth 2 score cp 214 time 1242 nodes 2124 nps 34928 pv e2e4 e7e5 g1f3`
 
-	I suggest to start sending `currmove`, `currmovenumber`, `currline` and `refutation` only after one second
-	to avoid too much traffic.
+	I suggest to start sending `currmove`, `currmovenumber`, `currline` and `refutation` only after one second to avoid too much traffic.
 
 	Additional info:
 
@@ -311,8 +289,7 @@ These are all the command the engine gets from the interface.
 
 	* `seldepth <x>`
 
-		selective search depth in plies,
-		if the engine sends seldepth there must also be a `depth` present in the same string.
+		selective search depth in plies, if the engine sends seldepth there must also be a `depth` present in the same string.
 
 	* `time <x>`
 
@@ -384,49 +361,36 @@ These are all the command the engine gets from the interface.
 
 	* `string <str>`
 
-		any string str which will be displayed be the engine,
-		if there is a string command the rest of the line will be interpreted as `<str>`.
+		any string str which will be displayed be the engine, if there is a string command the rest of the line will be interpreted as `<str>`.
 
 	* `refutation <move1> <move2> ... <movei>`
 
 	   move `<move1>` is refuted by the line `<move2>` ... `<movei>`, i can be any number >= 1.
 
-	   Example: after move d1h5 is searched, the engine can send
-	   `info refutation d1h5 g6h5`
-	   if g6h5 is the best answer after d1h5 or if g6h5 refutes the move d1h5.
-	   if there is no refutation for d1h5 found, the engine should just send
-	   `info refutation d1h5`
+	   Example: after move d1h5 is searched, the engine can send `info refutation d1h5 g6h5` if g6h5 is the best answer after d1h5 or if g6h5 refutes the move d1h5. if there is no refutation for d1h5 found, the engine should just send `info refutation d1h5`
 
 		The engine should only send this if the option `UCI_ShowRefutations` is set to true.
 
 	* `currline <cpunr> <move1> ... <movei>`
 
-	   this is the current line the engine is calculating. `<cpunr>` is the number of the cpu if
-	   the engine is running on more than one cpu. `<cpunr>` = 1,2,3....
+	   this is the current line the engine is calculating. `<cpunr>` is the number of the cpu if the engine is running on more than one cpu. `<cpunr>` = 1,2,3....
 
 	   if the engine is just using one cpu, `<cpunr>` can be omitted.
 
-	   If `<cpunr>` is greater than 1, always send all k lines in k strings together.
-		The engine should only send this if the option `UCI_ShowCurrLine` is set to true.
+	   If `<cpunr>` is greater than 1, always send all k lines in k strings together. The engine should only send this if the option `UCI_ShowCurrLine` is set to true.
 	
 
 * `option`
 
 	This command tells the GUI which parameters can be changed in the engine.
 
-	This should be sent once at engine startup after the `uci` and the `id` commands
-	if any parameter can be changed in the engine.
-	The GUI should parse this and build a dialog for the user to change the settings.
+	This should be sent once at engine startup after the `uci` and the `id` commands if any parameter can be changed in the engine. The GUI should parse this and build a dialog for the user to change the settings.
 	
-	Note that not every option needs to appear in this dialog as some options like
-	`Ponder`, `UCI_AnalyseMode`, etc. are better handled elsewhere or are set automatically.
+	Note that not every option needs to appear in this dialog as some options like `Ponder`, `UCI_AnalyseMode`, etc. are better handled elsewhere or are set automatically.
 	
-	If the user wants to change some settings, the GUI will send a `setoption` command to the engine.
-	Note that the GUI need not send the setoption command when starting the engine for every option if
-	it doesn't want to change the default value.
+	If the user wants to change some settings, the GUI will send a `setoption` command to the engine. Note that the GUI need not send the setoption command when starting the engine for every option if it doesn't want to change the default value.
 	
-	For all allowed combinations see the examples below,
-	as some combinations of this tokens don't make sense.
+	For all allowed combinations see the examples below, as some combinations of this tokens don't make sense.
 	
 	One string will be sent for each parameter.
 	
@@ -436,19 +400,11 @@ These are all the command the engine gets from the interface.
 	
 		Certain options have a fixed value for `<id>`, which means that the semantics of this option is fixed.
 	
-		Usually those options should not be displayed in the normal engine options window of the GUI but
-		get a special treatment. `Pondering` for example should be set automatically when pondering is
-		enabled or disabled in the GUI options. The same for `UCI_AnalyseMode` which should also be set
-		automatically by the GUI. All those certain options have the prefix `UCI_` except for the
-		first 6 options below. If the GUI gets an unknown Option with the prefix `UCI_`, it should just
-		ignore it and not display it in the engine's options dialog.
+		Usually those options should not be displayed in the normal engine options window of the GUI but get a special treatment. `Pondering` for example should be set automatically when pondering is enabled or disabled in the GUI options. The same for `UCI_AnalyseMode` which should also be set automatically by the GUI. All those certain options have the prefix `UCI_` except for the first 6 options below. If the GUI gets an unknown Option with the prefix `UCI_`, it should just ignore it and not display it in the engine's options dialog.
 
 		* `<id> = Hash`, type is `spin`
 
-			the value in MB for memory for hash tables can be changed,
-			this should be answered with the first `setoptions` command at program boot
-			if the engine has sent the appropriate `option name Hash` command,
-			which should be supported by all engines!
+			the value in MB for memory for hash tables can be changed, this should be answered with the first `setoptions` command at program boot if the engine has sent the appropriate `option name Hash` command, which should be supported by all engines!
 
 			So the engine should use a very small hash first as default.
 
@@ -462,8 +418,7 @@ These are all the command the engine gets from the interface.
 
 			this is the size in MB for the cache for the nalimov table bases
 
-			These last two options should also be present in the initial options exchange dialog
-			when the engine is booted if the engine supports it
+			These last two options should also be present in the initial options exchange dialog when the engine is booted if the engine supports it
 
 		* `<id> = Ponder`, type `check`
 
@@ -471,15 +426,11 @@ These are all the command the engine gets from the interface.
 
 			The GUI will send this whenever pondering is possible or not.
 
-			Note: The engine should not start pondering on its own if this is enabled, this option is only
-			needed because the engine might change its time management algorithm when pondering is allowed.
+			Note: The engine should not start pondering on its own if this is enabled, this option is only needed because the engine might change its time management algorithm when pondering is allowed.
 
 		* `<id> = OwnBook`, type `check`
 
-			this means that the engine has its own book which is accessed by the engine itself.
-			if this is set, the engine takes care of the opening book and the GUI will never
-			execute a move out of its book for the engine. If this is set to false by the GUI,
-			the engine should not access its own book.
+			this means that the engine has its own book which is accessed by the engine itself. if this is set, the engine takes care of the opening book and the GUI will never execute a move out of its book for the engine. If this is set to false by the GUI, the engine should not access its own book.
 
 		* `<id> = MultiPV`, type `spin`
 
@@ -495,8 +446,7 @@ These are all the command the engine gets from the interface.
 
 		* `<id> = UCI_LimitStrength`, type `check`, should be `false` by default,
 
-			The engine is able to limit its strength to a specific Elo number,
-		   This should always be implemented together with `UCI_Elo`.
+			The engine is able to limit its strength to a specific Elo number, This should always be implemented together with `UCI_Elo`.
 
 		* `<id> = UCI_Elo`, type `spin`
 
@@ -510,14 +460,11 @@ These are all the command the engine gets from the interface.
 
 		* `<id> = UCI_AnalyseMode`, type `check`
 
-		   The engine wants to behave differently when analysing or playing a game.
-		   For example when playing it can use some kind of learning.
-		   This is set to false if the engine is playing a game, otherwise it is true.
+		   The engine wants to behave differently when analysing or playing a game. For example when playing it can use some kind of learning. This is set to false if the engine is playing a game, otherwise it is true.
 
 		 * `<id> = UCI_Opponent`, type `string`
 
-		   With this command the GUI can send the name, title, elo and if the engine is playing a human
-		   or computer to the engine.
+		   With this command the GUI can send the name, title, elo and if the engine is playing a human or computer to the engine.
 
 		   The format of the string has to be `[GM|IM|FM|WGM|WIM|none] [<elo>|none] [computer|human] <name>`
 
@@ -528,8 +475,7 @@ These are all the command the engine gets from the interface.
 
 		 * `<id> = UCI_EngineAbout`, type `string`
 
-		   With this command, the engine tells the GUI information about itself, for example a license text,
-		   usually it doesn't make sense that the GUI changes this text with the setoption command.
+		   With this command, the engine tells the GUI information about itself, for example a license text, usually it doesn't make sense that the GUI changes this text with the setoption command.
 
 		   Example:
 
@@ -537,13 +483,11 @@ These are all the command the engine gets from the interface.
 
 		* `<id> = UCI_ShredderbasesPath`, type `string`
 
-			this is either the path to the folder on the hard disk containing the Shredder endgame databases or
-			the path and filename of one Shredder endgame datbase.
+			this is either the path to the folder on the hard disk containing the Shredder endgame databases or the path and filename of one Shredder endgame datbase.
 
 	   * `<id> = UCI_SetPositionValue`, type `string`
 
-	      the GUI can send this to the engine to tell the engine to use a certain value in centipawns from white's
-	      point of view if evaluating this specifix position. 
+	      the GUI can send this to the engine to tell the engine to use a certain value in centipawns from white's point of view if evaluating this specifix position. 
 
 	      The string can have the formats:
 
@@ -573,8 +517,7 @@ These are all the command the engine gets from the interface.
 
 		* `string`
 
-			a text field that has a string as a value,
-			an empty string has the value `<empty>`
+			a text field that has a string as a value, an empty string has the value `<empty>`
 
 	* `default <x>`
 
@@ -695,22 +638,10 @@ This is how the communication when the engine boots can look like:
 
 UCI could easily be extended to support Chess960 (also known as Fischer Random Chess).
 
-The engine has to tell the GUI that it is capable of playing Chess960 and the GUI has to tell
-the engine that is should play according to the Chess960 rules.
-This is done by the special engine option UCI_Chess960. If the engine knows about Chess960
-it should send the command 'option name UCI_Chess960 type check default false'
-to the GUI at program startup.
-Whenever a Chess960 game is played, the GUI should set this engine option to 'true'.
+The engine has to tell the GUI that it is capable of playing Chess960 and the GUI has Jto tell the engine that is should play according to the Chess960 rules. This is done by the special engine option UCI_Chess960. If the engine knows about Chess960 it should send the command 'option name UCI_Chess960 type check default false' to the GUI at program startup. Whenever a Chess960 game is played, the GUI should set this engine option to 'true'.
 
-Castling is different in Chess960 and the white king move when castling short is not always e1g1.
-A king move could both be the castling king move or just a normal king move.
-This is why castling moves are sent in the form king "takes" his own rook.
-Example: e1h1 for the white short castle move in the normal chess start position.
+Castling is different in Chess960 and the white king move when castling short is not always e1g1. A king move could both be the castling king move or just a normal king move. This is why castling moves are sent in the form king "takes" his own rook. Example: e1h1 for the white short castle move in the normal chess start position.
 
-In EPD and FEN position strings specifying the castle rights with w and q is not enough as
-there could be more than one rook on the right or left side of the king.
-This is why the castle rights are specified with the letter of the castle rook's line.
-Upper case letters for white's and lower case letters for black's castling rights.
-Example: The normal chess position would be:
+In EPD and FEN position strings specifying the castle rights with w and q is not enough as there could be more than one rook on the right or left side of the king. This is why the castle rights are specified with the letter of the castle rook's line. Upper case letters for white's and lower case letters for black's castling rights. Example: The normal chess position would be:
 
     rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w AHah -
