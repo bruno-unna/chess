@@ -219,6 +219,7 @@ These are all the command the engine gets from the interface.
 		e.g. "id name Shredder X.Y\n"
 
 	* author <x>
+
 		this must be sent after receiving the "uci" command to identify the engine,
 		e.g. "id author Stefan MK\n"
 
