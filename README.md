@@ -13,7 +13,9 @@ There are several standards, of which two are outstanding:
 This program implements UCI, because it's more modern and better supported by front-end programs than CECP.
 
 ### UCI implementation
-In this program UCI is implemented as a [finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine), supported by [Akka's FSM actors](https://doc.akka.io/docs/akka/current/fsm.html). 
+In this program UCI is implemented as a [finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine), supported by [Akka's FSM actors](https://doc.akka.io/docs/akka/current/fsm.html).
+
+A FSM can be described as a set of relations of the form: `State(S) x Event(E) -> Actions (A), State(S’)`. In a given state `S`, receiving an event `E` from the front-end triggers a set of actions (effects) and sets the machine to a new state `S´`.
 
 ## Computational model
 
