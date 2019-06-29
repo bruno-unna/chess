@@ -1,7 +1,4 @@
-
-
-Description of the universal chess interface (UCI)    April  2006
-=================================================================
+# Description of the universal chess interface (UCI)    April  2006
 
 * The specification is independent of the operating system. For Windows,
   the engine is a normal exe file, either a console or "real" windows application.
