@@ -19,7 +19,7 @@ In this program the UCI is implemented as a [finite-state machine](https://en.wi
 
 A FSM can be described as a set of relations of the form: `State(S) x Event(E) -> Actions (A), State(S’)`. In a given state `S`, receiving an event `E` from the front-end triggers a set of actions (effects) and sets the machine to a new state `S´`.
 
-States: `Idle` (the engine is doing nothing), `Ready` (initialised, can receive the `uci` command), `Waiting` (waiting to receive commands), `Dead`, `GameResetting`.
+States: `Idle` (the engine is doing nothing), `Ready` (initialised, can receive the `uci` command), `Waiting` (waiting to receive commands), `Dead`, `GameResetting`, `Thinking`.
 
 Events that can be sent by the GUI: `UCI`, `Debug`, `IsReady`, `SetOption`, `Register`, `UCINewGame`, `Position`, `Go`, `Stop`, `PonderHit`, `Quit`.
 
@@ -42,6 +42,7 @@ Internally generated events: `GameReset`, `ThinkingStopped`.
 | `Thinking` | `ThinkingStopped` | Stop evaluating, send `bestmove`+`ponder` | `Waiting` |
 | `Thinking` | `Stop` | Stop evaluating, send `bestmove`+`ponder` | `Waiting` |
 | `Waiting` | `Quit` | Exit | `Dead` |
+| `Dead` | - | - | `Dead` |
 
 
 ## Computational model
