@@ -19,14 +19,29 @@ In this program the UCI is implemented as a [finite-state machine](https://en.wi
 
 A FSM can be described as a set of relations of the form: `State(S) x Event(E) -> Actions (A), State(S’)`. In a given state `S`, receiving an event `E` from the front-end triggers a set of actions (effects) and sets the machine to a new state `S´`.
 
-States: `Idle` (the engine is doing nothing), `Ready` (initialised, can receive the `uci` command), `Waiting` (waiting to receive commands), `Dead`.
+States: `Idle` (the engine is doing nothing), `Ready` (initialised, can receive the `uci` command), `Waiting` (waiting to receive commands), `Dead`, `GameResetting`.
 
-Commands: `UCI`, `Debug`, `IsReady`, `SetOption`, `Register`, `UCINewGame`, `Position`, `Go`, `Stop`, `PonderHit`, `Quit`. 
+Events that can be sent by the GUI: `UCI`, `Debug`, `IsReady`, `SetOption`, `Register`, `UCINewGame`, `Position`, `Go`, `Stop`, `PonderHit`, `Quit`.
+
+Internally generated events: `GameReset`, `ThinkingStopped`.
 
 | State | Event | Actions | New state |
 |-------|-------|---------|-----------|
-| `Initial` | `UCI` | Initialise, send `uciok` | `Ready` |
-| `Ready` | `Quit` | Exit | `End` (virtual state) |
+| `Idle` | `Start` | Initialise | `Ready` |
+| `Ready` | `UCI` | Send `id`..., send `option`..., send `uciok` | `Waiting` |
+| `Waiting` | `Debug` | Set debug on/off | `Waiting` |
+| `Waiting` | `IsReady` | Send `readyok` | `Waiting` |
+| `Waiting` | `SetOption` | Change an option | `Waiting` |
+| `Waiting` | `Register` | Set registration information | `Waiting` |
+| `Waiting` | `UCINewGame` | Reset game information | `GameResetting` |
+| `GameResetting` | `IsReady` | Set `readyok` as pending | `GameResetting` |
+| `GameResetting` | `GameReset` | Send `readyok` if pending | `Waiting` |
+| `Waiting` | `Position` | Set internal board | `Waiting` |
+| `Waiting` | `Go` | Start evaluating | `Thinking` |
+| `Thinking` | `PonderHit` | Deactivate pondering | `Thinking` |
+| `Thinking` | `ThinkingStopped` | Stop evaluating, send `bestmove`+`ponder` | `Waiting` |
+| `Thinking` | `Stop` | Stop evaluating, send `bestmove`+`ponder` | `Waiting` |
+| `Waiting` | `Quit` | Exit | `Dead` |
 
 
 ## Computational model
