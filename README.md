@@ -38,6 +38,7 @@ Internally generated events: `GameReset`, `ThinkingStopped`.
 | `GameResetting` | `GameReset` | Send `readyok` if pending | `Waiting` |
 | `Waiting` | `Position` | Set internal board | `Waiting` |
 | `Waiting` | `Go` | Start evaluating | `Thinking` |
+| `Thinking` | `IsReady` | Send `readyok` | `Thinking` |
 | `Thinking` | `PonderHit` | Deactivate pondering | `Thinking` |
 | `Thinking` | `ThinkingStopped` | Stop evaluating, send `bestmove`+`ponder` | `Waiting` |
 | `Thinking` | `Stop` | Stop evaluating, send `bestmove`+`ponder` | `Waiting` |
