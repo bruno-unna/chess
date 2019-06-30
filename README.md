@@ -23,6 +23,12 @@ States: `Idle` (the engine is doing nothing), `Ready` (initialised, can receive 
 
 Commands: `UCI`, `Debug`, `IsReady`, `SetOption`, `Register`, `UCINewGame`, `Position`, `Go`, `Stop`, `PonderHit`, `Quit`. 
 
+| State | Event | Actions | New state |
+|-------|-------|---------|-----------|
+| `Initial` | `UCI` | Initialise, send `uciok` | `Ready` |
+| `Ready` | `Quit` | Exit | `End` (virtual state) |
+
+
 ## Computational model
 
 ## References
