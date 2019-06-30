@@ -32,7 +32,7 @@ Internally generated events: `GameReset`, `ThinkingStopped`.
 | `Waiting` | `Debug` | Set debug on/off | `Waiting` |
 | `Waiting` | `IsReady` | Send `readyok` | `Waiting` |
 | `Waiting` | `SetOption` | Change an option | `Waiting` |
-| `Waiting` | `Register` | Set registration information | `Waiting` |
+| `Waiting` | `Register` | Send successful registration strings | `Waiting` |
 | `Waiting` | `UCINewGame` | Reset game information | `GameResetting` |
 | `GameResetting` | `IsReady` | Set `readyok` as pending | `GameResetting` |
 | `GameResetting` | `GameReset` | Send `readyok` if pending | `Waiting` |
@@ -40,11 +40,12 @@ Internally generated events: `GameReset`, `ThinkingStopped`.
 | `Waiting` | `Go` | Start evaluating | `Thinking` |
 | `Thinking` | `IsReady` | Send `readyok` | `Thinking` |
 | `Thinking` | `PonderHit` | Deactivate pondering | `Thinking` |
-| `Thinking` | `ThinkingStopped` | Stop evaluating, send `bestmove`+`ponder` | `Waiting` |
-| `Thinking` | `Stop` | Stop evaluating, send `bestmove`+`ponder` | `Waiting` |
+| `Thinking` | `ThinkingStopped` | Stop evaluating, send `info`+`bestmove`+`ponder` | `Waiting` |
+| `Thinking` | `Stop` | Stop evaluating, send `info`+`bestmove`+`ponder` | `Waiting` |
 | `Waiting` | `Quit` | Exit | `Dead` |
 | `Dead` | - | - | `Dead` |
 
+The licensing model of this program makes the use of the `copyprotection` response irrelevant. Also, the registration process is always instantaneously successful.
 
 ## Computational model
 
