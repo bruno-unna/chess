@@ -47,6 +47,8 @@ Internally generated events: `GameReset`, `ThinkingStopped`.
 
 The licensing model of this program makes the use of the `copyprotection` response irrelevant. Also, the registration process is always instantaneously successful.
 
+Currently, the only option supported by the program is `Ponder`.
+
 ## Computational model
 
 ## References
