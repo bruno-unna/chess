@@ -91,7 +91,7 @@ object State extends Enum[State] {
 }
 
 /** Data held by the FSM when transitioning between [[org.chess.State]]s. */
-case class Options(ponder: Boolean, ownBook: Boolean, debug: Boolean)
+case class Options(ponder: Boolean, debug: Boolean)
 
 import org.chess.Keyword._
 import org.chess.State._
@@ -108,7 +108,7 @@ import org.chess.State._
   */
 class UCIInterpreter extends LoggingFSM[State, Options] {
 
-  startWith(Idle, Options(ponder = true, ownBook = false, debug = false))
+  startWith(Idle, Options(ponder = true, debug = false))
 
   when(Idle) {
     case Event(Start, _) =>
@@ -163,7 +163,6 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
       println("id name Chess 0.1.0")
       println("id author Bruno Unna")
       println(s"option name Ponder type check default ${stateData.ponder}")
-      println(s"option name OwnBook type check default ${stateData.ownBook}")
       println("option name UCI_EngineAbout type string " +
         "default Chess by Bruno Unna, " +
         "see https://gitlab.com/bruno.unna/chess")
