@@ -121,11 +121,14 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
   }
 
   when(Waiting) {
-    // TODO provide handlers for all possible commands
-    case Event(Command(SetOption, _), _) =>
-      stay
+    case Event(Command(Debug, args), stateData) =>
+      val newDebugStatus = args.headOption.map(_.toLowerCase).contains("on")
+      println(s"info debug ${if(newDebugStatus) "on" else "off"}")
+      stay.using(stateData.copy(debug = newDebugStatus))
     case Event(Command(IsReady, _), _) =>
       println("readyok")
+      stay
+    case Event(Command(SetOption, args), _) =>
       stay
   }
 
