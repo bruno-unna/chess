@@ -82,6 +82,10 @@ object State extends Enum[State] {
 
   case object Dead extends State
 
+  case object GameResetting extends State
+
+  case object Thinking extends State
+
   override def values: immutable.IndexedSeq[State] = findValues
 
 }
