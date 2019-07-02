@@ -137,8 +137,10 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
     case Event(Command(Register, args), _) =>
       stay
     case Event(Command(UCINewGame, _), _) =>
-      stay
+      // TODO provoke the reset of the system (make sure a `GameReset` command is sent at the end).
+      goto(GameResetting)
     case Event(Command(Position, args), _) =>
+      // TODO setup the given position on the internal board and play the given moves
       stay
     case Event(Command(Go, args), _) =>
       // TODO start thinking. When done, send a `ThinkingStopped` command.
@@ -148,11 +150,8 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
   when(GameResetting) {
     case Event(Command(IsReady, _), _) =>
       readyOkPending = true
-      // TODO provoke the reset of the system (make sure a `GameReset` command is sent at the end).
       stay
     case Event(Command(GameReset, _), _) =>
-      readyOkPending = false
-      println("readyok")
       goto(Waiting)
   }
 
@@ -180,7 +179,6 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
   // Use this for all messages that should be available always
   whenUnhandled {
     case Event(Command(Quit, _), _) =>
-      // release resources, etc.
       goto(Dead)
     case Event(Command(Debug, args), options) =>
       if (args.exists(_.toLowerCase == "on")) stay using options.copy(debug = true)
@@ -207,7 +205,11 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
         "default Chess by Bruno Unna, " +
         "see https://gitlab.com/bruno.unna/chess")
       println("uciok")
+    case GameResetting -> Waiting =>
+      if (readyOkPending) println("readyok")
+      readyOkPending = false
     case _ -> Dead =>
+      // TODO release resources, etc.
       context stop self
       context.system.terminate()
   }
