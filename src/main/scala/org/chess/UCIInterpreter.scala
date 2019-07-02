@@ -141,17 +141,33 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
     case Event(Command(Position, args), _) =>
       stay
     case Event(Command(Go, args), _) =>
+      // TODO start thinking. When done, send a `ThinkingStopped` command.
       goto(Thinking)
   }
 
   when(GameResetting) {
     case Event(Command(IsReady, _), _) =>
       readyOkPending = true
-      // TODO provoke the reset of the system (make sure a `GameReset` event is sent at the end)
+      // TODO provoke the reset of the system (make sure a `GameReset` command is sent at the end).
       stay
     case Event(Command(GameReset, _), _) =>
       readyOkPending = false
       println("readyok")
+      goto(Waiting)
+  }
+
+  when(Thinking) {
+    case Event(Command(IsReady, _), _) =>
+      println("readyok")
+      stay
+    case Event(Command(PonderHit, _), options) =>
+      // TODO the user has played the expected move. Do something. Keep searching.
+      stay using options.copy(ponder = false)
+    case Event(Command(ThinkingStopped, args), _) =>
+      // TODO use the `args` to extract result (and print it out)
+      goto(Waiting)
+    case Event(Command(Stop, _), _) =>
+      // TODO provoke the termination of computation (make sure it sends a `ThinkingStopped` at the end).
       goto(Waiting)
   }
 
