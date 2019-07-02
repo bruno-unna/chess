@@ -126,6 +126,14 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
       stay
     case Event(Command(SetOption, args), _) =>
       stay
+    case Event(Command(Register, args), _) =>
+      stay
+    case Event(Command(UCINewGame, _), _) =>
+      stay
+    case Event(Command(Position, args), _) =>
+      stay
+    case Event(Command(Go, args), _) =>
+      goto(Thinking)
   }
 
   when(Dead) {
