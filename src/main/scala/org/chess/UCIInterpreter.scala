@@ -36,6 +36,11 @@ object Keyword extends Enum[Keyword] {
 
   case object Quit extends Keyword
 
+  // Next Keywords are internally used to signal transitions
+  case object GameReset extends Keyword
+
+  case object ThinkingStopped extends Keyword
+
   override def values: immutable.IndexedSeq[Keyword] = findValues
 
 }
@@ -108,6 +113,9 @@ import org.chess.State._
   */
 class UCIInterpreter extends LoggingFSM[State, Options] {
 
+  // For long term operations, this signals that an ok response is pending
+  var readyOkPending = false
+
   startWith(Idle, Options(ponder = true, debug = false))
 
   when(Idle) {
@@ -134,6 +142,17 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
       stay
     case Event(Command(Go, args), _) =>
       goto(Thinking)
+  }
+
+  when(GameResetting) {
+    case Event(Command(IsReady, _), _) =>
+      readyOkPending = true
+      // TODO provoke the reset of the system (make sure a `GameReset` event is sent at the end)
+      stay
+    case Event(Command(GameReset, _), _) =>
+      readyOkPending = false
+      println("readyok")
+      goto(Waiting)
   }
 
   when(Dead) {
