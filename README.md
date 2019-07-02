@@ -47,7 +47,7 @@ Internally generated events: `GameReset`, `ThinkingStopped`.
 
 The licensing model of this program makes the use of the `copyprotection` response irrelevant. Also, the registration process is always instantaneously successful.
 
-Currently, the only option supported by the program is `Ponder`.
+Currently, the only options supported by the program are `UCI_EngineAbout` (for which there is no equivalent `SetOption` command) and `Ponder`.
 
 ## Computational model
 
