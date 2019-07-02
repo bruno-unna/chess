@@ -121,10 +121,6 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
   }
 
   when(Waiting) {
-    case Event(Command(Debug, args), stateData) =>
-      val newDebugStatus = args.headOption.map(_.toLowerCase).contains("on")
-      println(s"info debug ${if(newDebugStatus) "on" else "off"}")
-      stay.using(stateData.copy(debug = newDebugStatus))
     case Event(Command(IsReady, _), _) =>
       println("readyok")
       stay
@@ -141,6 +137,7 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
   // Use this for all messages that should be available always
   whenUnhandled {
     case Event(Command(Quit, _), _) =>
+      // release resources, etc.
       goto(Dead)
     case Event(Command(Debug, args), options) =>
       if (args.exists(_.toLowerCase == "on")) stay using options.copy(debug = true)
