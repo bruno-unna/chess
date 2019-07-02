@@ -36,12 +36,16 @@ Internally generated events: `GameReset`, `ThinkingStopped`.
 | `Waiting` | `UCINewGame` | Reset game information | `GameResetting` |
 | `GameResetting` | `IsReady` | Set `readyok` as pending | `GameResetting` |
 | `GameResetting` | `GameReset` | Send `readyok` if pending | `Waiting` |
+| `GameResetting` | `Debug` | Set debug on/off | `GameResetting` |
+| `GameResetting` | `Quit` | Exit | `Dead` |
 | `Waiting` | `Position` | Set internal board | `Waiting` |
 | `Waiting` | `Go` | Start evaluating | `Thinking` |
 | `Thinking` | `IsReady` | Send `readyok` | `Thinking` |
 | `Thinking` | `PonderHit` | Deactivate pondering | `Thinking` |
 | `Thinking` | `ThinkingStopped` | Stop evaluating, send `info`+`bestmove`+`ponder` | `Waiting` |
 | `Thinking` | `Stop` | Stop evaluating, send `info`+`bestmove`+`ponder` | `Waiting` |
+| `Thinking` | `Debug` | Set debug on/off | `Thinking` |
+| `Thinking` | `Quit` | Exit | `Dead` |
 | `Waiting` | `Quit` | Exit | `Dead` |
 | `Dead` | - | - | `Dead` |
 
