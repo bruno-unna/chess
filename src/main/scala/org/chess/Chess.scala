@@ -15,7 +15,7 @@ import scala.io.Source
 object Chess extends App {
   val system: ActorSystem = ActorSystem("chess")
 
-  val uci: ActorRef = system.actorOf(UCIInterpreter.props, "UCIAutomaton")
+  val uci: ActorRef = system.actorOf(UCIInterpreter.props(println), "UCIAutomaton")
 
   uci ! Start
 

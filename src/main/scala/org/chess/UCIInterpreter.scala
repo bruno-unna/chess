@@ -111,7 +111,7 @@ import org.chess.State._
   * class, that holds all options that can be changed, usually by means
   * of the [[org.chess.Keyword.SetOption]] event.
   */
-class UCIInterpreter extends LoggingFSM[State, Options] {
+class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
 
   // For long term operations, this signals that an ok response is pending
   var readyOkPending = false
@@ -130,7 +130,7 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
 
   when(Waiting) {
     case Event(Command(IsReady, _), _) =>
-      println("readyok")
+      out("readyok")
       stay
     case Event(Command(SetOption, args), _) =>
       stay
@@ -157,7 +157,7 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
 
   when(Thinking) {
     case Event(Command(IsReady, _), _) =>
-      println("readyok")
+      out("readyok")
       stay
     case Event(Command(PonderHit, _), options) =>
       // TODO the user has played the expected move. Do something. Keep searching.
@@ -198,15 +198,15 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
 
   onTransition {
     case Ready -> Waiting =>
-      println("id name Chess 0.1.0")
-      println("id author Bruno Unna")
-      println(s"option name Ponder type check default ${stateData.ponder}")
-      println("option name UCI_EngineAbout type string " +
+      out("id name Chess 0.1.0")
+      out("id author Bruno Unna")
+      out(s"option name Ponder type check default ${stateData.ponder}")
+      out("option name UCI_EngineAbout type string " +
         "default Chess by Bruno Unna, " +
         "see https://gitlab.com/bruno.unna/chess")
-      println("uciok")
+      out("uciok")
     case GameResetting -> Waiting =>
-      if (readyOkPending) println("readyok")
+      if (readyOkPending) out("readyok")
       readyOkPending = false
     case _ -> Dead =>
       // TODO release resources, etc.
@@ -220,5 +220,5 @@ class UCIInterpreter extends LoggingFSM[State, Options] {
 /** Provides the `Props` for the instantiation of the FSM. */
 object UCIInterpreter {
   /** `Props` object to ease the creation of the FSM. */
-  val props: Props = Props(new UCIInterpreter)
+  def props(outputFunction: String => Unit): Props = Props(new UCIInterpreter(outputFunction))
 }

@@ -26,7 +26,7 @@ class UCIInterpreterSpec(_system: ActorSystem)
 
     "be able to quit" in {
       val testProbe = TestProbe()
-      val interpreter = system.actorOf(UCIInterpreter.props)
+      val interpreter = system.actorOf(UCIInterpreter.props(println))
       testProbe watch interpreter
       interpreter ! Command(Quit, Nil)
       testProbe.expectTerminated(interpreter, 3 seconds)
