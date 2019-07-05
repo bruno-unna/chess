@@ -29,4 +29,5 @@ object Chess extends App {
 
   // Out of the loop already? Let's quit!
   uci ! Command(Quit, Nil)
+  system.terminate()
 }

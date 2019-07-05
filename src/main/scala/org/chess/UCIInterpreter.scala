@@ -211,7 +211,6 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
     case _ -> Dead =>
       // TODO release resources, etc.
       context stop self
-      context.system.terminate()
   }
 
   initialize
