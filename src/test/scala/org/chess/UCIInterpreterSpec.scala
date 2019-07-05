@@ -2,7 +2,7 @@ package org.chess
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import org.chess.Keyword.Quit
+import org.chess.Keyword.{Quit, UCI}
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, Matchers}
 
@@ -16,12 +16,27 @@ class UCIInterpreterSpec
     with Matchers
     with BeforeAndAfterAll {
 
+  private val builder: StringBuilder = new StringBuilder
+
+  private val captureString: String => Unit = { str =>
+    builder.clear
+    builder.append(str)
+  }
+
   override def afterAll: Unit = {
     super.afterAll()
     shutdown(system)
   }
 
   "A UCI interpreter" should {
+
+    "get ready for action after a uci command" in {
+      val interpreter = system.actorOf(UCIInterpreter.props(captureString))
+      interpreter ! Start
+      interpreter ! Command(UCI, Nil)
+      awaitCond(builder.result() == "uciok", 3.seconds)
+      interpreter ! Command(Quit, Nil)
+    }
 
     "be able to quit" in {
       val testProbe = TestProbe()
