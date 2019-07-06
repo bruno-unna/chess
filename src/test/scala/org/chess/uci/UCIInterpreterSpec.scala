@@ -2,7 +2,7 @@ package org.chess.uci
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import org.chess.uci.Keyword.{Quit, UCI}
+import org.chess.uci.Keyword.{Debug, Quit, UCI}
 import org.chess.uci.UCIInterpreter.Start
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, Matchers}
@@ -36,6 +36,26 @@ class UCIInterpreterSpec
       interpreter ! Start
       interpreter ! Command(UCI, Nil)
       awaitCond(builder.result() == "uciok", 3.seconds)
+      interpreter ! Command(Quit, Nil)
+    }
+
+    "inform when debug is activated" in {
+      val interpreter = system.actorOf(UCIInterpreter.props(captureString))
+      interpreter ! Start
+      interpreter ! Command(UCI, Nil)
+      interpreter ! Command(Debug, List("on"))
+      awaitCond(builder.result() == "info debug is now on", 3.seconds)
+    }
+
+    "be quiet when debug is deactivated" in {
+      val interpreter = system.actorOf(UCIInterpreter.props(captureString))
+      interpreter ! Start
+      interpreter ! Command(UCI, Nil)
+      Thread.sleep(1.seconds.toMillis)
+      builder.clear
+      interpreter ! Command(Debug, List("off"))
+      Thread.sleep(2.seconds.toMillis)
+      assertResult("")(builder.result)
       interpreter ! Command(Quit, Nil)
     }
 
