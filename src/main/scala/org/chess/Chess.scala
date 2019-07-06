@@ -2,6 +2,7 @@ package org.chess
 
 import akka.actor.{ActorRef, ActorSystem}
 import org.chess.Keyword.Quit
+import org.chess.UCIInterpreter.Start
 
 import scala.io.Source
 

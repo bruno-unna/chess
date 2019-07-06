@@ -2,11 +2,9 @@ package org.chess
 
 import akka.actor.{LoggingFSM, Props}
 import enumeratum._
+import org.chess.UCIInterpreter.{GameReset, Start, ThinkingStopped}
 
 import scala.collection.immutable
-
-/** Kick-off event, used to signal the start of operation for the FSM. */
-case object Start
 
 /** Base trait of the [[org.chess.Keyword]] enumeration. */
 sealed trait Keyword extends EnumEntry
@@ -35,11 +33,6 @@ object Keyword extends Enum[Keyword] {
   case object PonderHit extends Keyword
 
   case object Quit extends Keyword
-
-  // Next Keywords are internally used to signal transitions
-  case object GameReset extends Keyword
-
-  case object ThinkingStopped extends Keyword
 
   override def values: immutable.IndexedSeq[Keyword] = findValues
 
@@ -104,7 +97,7 @@ import org.chess.State._
 /** Finite states machine for interpreting the UCI protocol.
   *
   * The machine starts in the [[org.chess.State.Idle]] state, from which only
-  * the [[org.chess.Start]] event can provoke a transition (to
+  * the [[org.chess.UCIInterpreter.Start]] event can provoke a transition (to
   * [[org.chess.State.Ready]]).
   *
   * The operational data of the machine is the [[org.chess.Options]] case
@@ -151,7 +144,7 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
     case Event(Command(IsReady, _), _) =>
       readyOkPending = true
       stay
-    case Event(Command(GameReset, _), _) =>
+    case Event(GameReset, _) =>
       goto(Waiting)
   }
 
@@ -162,7 +155,7 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
     case Event(Command(PonderHit, _), options) =>
       // TODO the user has played the expected move. Do something. Keep searching.
       stay using options.copy(ponder = false)
-    case Event(Command(ThinkingStopped, args), _) =>
+    case Event(ThinkingStopped, _) =>
       // TODO use the `args` to extract result (and print it out)
       goto(Waiting)
     case Event(Command(Stop, _), _) =>
@@ -220,4 +213,12 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
 object UCIInterpreter {
   /** `Props` object to ease the creation of the FSM. */
   def props(outputFunction: String => Unit): Props = Props(new UCIInterpreter(outputFunction))
+
+  /** Internal events, used to signal transitions. */
+  case object Start
+
+  case object GameReset
+
+  case object ThinkingStopped
+
 }

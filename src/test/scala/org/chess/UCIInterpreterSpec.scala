@@ -3,6 +3,7 @@ package org.chess
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import org.chess.Keyword.{Quit, UCI}
+import org.chess.UCIInterpreter.Start
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, Matchers}
 
