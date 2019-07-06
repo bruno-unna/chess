@@ -2,7 +2,7 @@ package org.chess.uci
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import org.chess.uci.Keyword.{Debug, Quit, UCI}
+import org.chess.uci.Keyword._
 import org.chess.uci.UCIInterpreter.Start
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, Matchers}
@@ -39,6 +39,14 @@ class UCIInterpreterSpec
       interpreter ! Command(Quit, Nil)
     }
 
+    "be able to quit" in {
+      val testProbe = TestProbe()
+      val interpreter = system.actorOf(UCIInterpreter.props(println))
+      testProbe watch interpreter
+      interpreter ! Command(Quit, Nil)
+      testProbe.expectTerminated(interpreter, 3 seconds)
+    }
+
     "inform when debug is activated" in {
       val interpreter = system.actorOf(UCIInterpreter.props(captureString))
       interpreter ! Start
@@ -59,12 +67,11 @@ class UCIInterpreterSpec
       interpreter ! Command(Quit, Nil)
     }
 
-    "be able to quit" in {
-      val testProbe = TestProbe()
-      val interpreter = system.actorOf(UCIInterpreter.props(println))
-      testProbe watch interpreter
-      interpreter ! Command(Quit, Nil)
-      testProbe.expectTerminated(interpreter, 3 seconds)
+    "handle 'ponder' option" in {
+      val interpreter = system.actorOf(UCIInterpreter.props(captureString))
+      interpreter ! Start
+      interpreter ! Command(UCI, Nil)
+      interpreter ! Command(SetOption, List("true"))
     }
 
   }
