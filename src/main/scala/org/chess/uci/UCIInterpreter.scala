@@ -1,108 +1,19 @@
-package org.chess
+package org.chess.uci
 
 import akka.actor.{LoggingFSM, Props}
-import enumeratum._
-import org.chess.UCIInterpreter.{GameReset, Start, ThinkingStopped}
-
-import scala.collection.immutable
-
-/** Base trait of the [[org.chess.Keyword]] enumeration. */
-sealed trait Keyword extends EnumEntry
-
-/** Enumeration for all possible keywords of the UCI protocol. */
-object Keyword extends Enum[Keyword] {
-
-  case object UCI extends Keyword
-
-  case object Debug extends Keyword
-
-  case object IsReady extends Keyword
-
-  case object SetOption extends Keyword
-
-  case object Register extends Keyword
-
-  case object UCINewGame extends Keyword
-
-  case object Position extends Keyword
-
-  case object Go extends Keyword
-
-  case object Stop extends Keyword
-
-  case object PonderHit extends Keyword
-
-  case object Quit extends Keyword
-
-  override def values: immutable.IndexedSeq[Keyword] = findValues
-
-}
-
-/** Wrapper around the [[org.chess.Keyword]] sent from the GUI to the engine, that includes
-  * the arguments of the command as a `List[String]`.
-  *
-  * @param keyword keyword sent by the GUI after having been understood as such
-  *                (i.e. this is an entry of an enumeration, not a `String`)
-  * @param args    arguments to the command as passed by the GUI
-  */
-case class Command(keyword: Keyword, args: List[String])
-
-/** Contains utility methods for the [[org.chess.Command]] case class. */
-object Command {
-
-  /** Creates an optional instance of [[org.chess.Command]], given a string (as passed by the GUI).
-    *
-    * @param string what the GUI sends
-    * @return `Some[Command]` if the string can be parsed as such, `None` otherwise
-    */
-  def fromString(string: String): Option[Command] = {
-    val words = string.split("\\s+").toList.
-      dropWhile(Keyword.withNameInsensitiveOption(_).isEmpty)
-    words match {
-      case keyword :: arguments =>
-        Keyword.withNameInsensitiveOption(keyword).map(Command(_, arguments))
-      case _ =>
-        None
-    }
-  }
-}
-
-sealed trait State extends EnumEntry
-
-/** Enumeration for all possible [[org.chess.State]]s of the FSM. */
-object State extends Enum[State] {
-
-  case object Idle extends State
-
-  case object Ready extends State
-
-  case object Waiting extends State
-
-  case object Dead extends State
-
-  case object GameResetting extends State
-
-  case object Thinking extends State
-
-  override def values: immutable.IndexedSeq[State] = findValues
-
-}
-
-/** Data held by the FSM when transitioning between [[org.chess.State]]s. */
-case class Options(ponder: Boolean, debug: Boolean)
-
-import org.chess.Keyword._
-import org.chess.State._
+import org.chess.uci.Keyword._
+import org.chess.uci.State._
+import org.chess.uci.UCIInterpreter._
 
 /** Finite states machine for interpreting the UCI protocol.
   *
-  * The machine starts in the [[org.chess.State.Idle]] state, from which only
-  * the [[org.chess.UCIInterpreter.Start]] event can provoke a transition (to
-  * [[org.chess.State.Ready]]).
+  * The machine starts in the [[org.chess.uci.State.Idle]] state, from which only
+  * the [[org.chess.uci.UCIInterpreter.Start]] event can provoke a transition (to
+  * [[org.chess.uci.State.Ready]]).
   *
-  * The operational data of the machine is the [[org.chess.Options]] case
+  * The operational data of the machine is the [[org.chess.uci.UCIInterpreter.Options]] case
   * class, that holds all options that can be changed, usually by means
-  * of the [[org.chess.Keyword.SetOption]] event.
+  * of the [[org.chess.uci.Keyword.SetOption]] event.
   */
 class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
 
@@ -213,6 +124,9 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
 object UCIInterpreter {
   /** `Props` object to ease the creation of the FSM. */
   def props(outputFunction: String => Unit): Props = Props(new UCIInterpreter(outputFunction))
+
+  /** Data held by the FSM when transitioning between [[org.chess.uci.State]]s. */
+  case class Options(ponder: Boolean, debug: Boolean)
 
   /** Internal events, used to signal transitions. */
   case object Start

@@ -1,8 +1,9 @@
 package org.chess
 
 import akka.actor.{ActorRef, ActorSystem}
-import org.chess.Keyword.Quit
-import org.chess.UCIInterpreter.Start
+import org.chess.uci.Keyword.Quit
+import org.chess.uci.UCIInterpreter.Start
+import org.chess.uci.{Command, UCIInterpreter}
 
 import scala.io.Source
 

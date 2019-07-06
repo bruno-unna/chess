@@ -1,9 +1,9 @@
-package org.chess
+package org.chess.uci
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import org.chess.Keyword.{Quit, UCI}
-import org.chess.UCIInterpreter.Start
+import org.chess.uci.Keyword.{Quit, UCI}
+import org.chess.uci.UCIInterpreter.Start
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, Matchers}
 
