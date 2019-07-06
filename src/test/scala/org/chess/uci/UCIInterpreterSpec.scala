@@ -2,7 +2,7 @@ package org.chess.uci
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import org.chess.uci.Keyword.{Quit, UCI}
+import org.chess.uci.Keyword.{Quit, SetOption, UCI}
 import org.chess.uci.UCIInterpreter.Start
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, Matchers}
@@ -45,6 +45,13 @@ class UCIInterpreterSpec
       testProbe watch interpreter
       interpreter ! Command(Quit, Nil)
       testProbe.expectTerminated(interpreter, 3 seconds)
+    }
+
+    "handle 'ponder' option" in {
+      val interpreter = system.actorOf(UCIInterpreter.props(captureString))
+      interpreter ! Start
+      interpreter ! Command(UCI, Nil)
+      interpreter ! Command(SetOption, List("true"))
     }
 
   }
