@@ -20,6 +20,11 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
   // For long term operations, this signals that an ok response is pending
   var readyOkPending = false
 
+  def warning(msg: String, sendToClient: Boolean): Unit = {
+    if (sendToClient) out("warning: " + msg)
+    log.warning(msg)
+  }
+
   startWith(Idle, Options(ponder = true, debug = false))
 
   when(Idle) {
@@ -36,8 +41,24 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
     case Event(Command(IsReady, _), _) =>
       out("readyok")
       stay
-    case Event(Command(SetOption, args), _) =>
-      stay
+    case Event(Command(SetOption, args), options) =>
+      val pattern = "^name (.*?)(?: value (.*))?$".r
+      val input = args.mkString(" ").toLowerCase
+      val maybeMatch = pattern.findFirstMatchIn(input)
+      val passedOption: Option[(String, Option[String])] = maybeMatch match {
+        case Some(patternMatch) if patternMatch.groupCount == 2 => Some(patternMatch.group(0), Some(patternMatch.group(1)))
+        case Some(patternMatch) => Some(patternMatch.group(0), None)
+        case _ => None
+      }
+      val newOptions = passedOption match {
+        case Some(("ponder", Some("true"))) => options.copy(ponder = true)
+        case Some(("ponder", Some("false"))) => options.copy(ponder = false)
+        case Some(("ponder", _)) =>
+          warning("wrong parameter for command ponder, expected true or false", options.debug)
+          options
+        case _ => options
+      }
+      stay using newOptions
     case Event(Command(Register, args), _) =>
       stay
     case Event(Command(UCINewGame, _), _) =>
