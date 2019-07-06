@@ -85,12 +85,14 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
     case Event(Command(Quit, _), _) =>
       goto(Dead)
     case Event(Command(Debug, args), options) =>
-      if (args.exists(_.toLowerCase == "on")) stay using options.copy(debug = true)
-      else if (args.exists(_.toLowerCase == "off")) stay using options.copy(debug = false)
+      val newOptions = if (args.exists(_.toLowerCase == "on")) options.copy(debug = true)
+      else if (args.exists(_.toLowerCase == "off")) options.copy(debug = false)
       else {
         log.warning("invalid input to command debug (should be on or off)")
-        stay
+        options
       }
+      if (newOptions.debug) out("info debug is now on")
+      stay using newOptions
     case Event(Command(IsReady, _), _) =>
       log.error("command isReady is not handled in state {} but should", stateName)
       stay
