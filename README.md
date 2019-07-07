@@ -49,7 +49,9 @@ Internally generated events: `GameReset`, `ThinkingStopped`.
 | `Waiting` | `Quit` | Exit | `Dead` |
 | `Dead` | - | - | `Dead` |
 
-The licensing model of this program makes the use of the `copyprotection` response irrelevant. Also, the registration process is always instantaneously successful.
+### Current abilities
+
+The licensing model of this program (GPL-3.0) makes the use of the `copyprotection` response irrelevant. Also, the registration process is always instantaneously successful.
 
 Currently, the only options supported by the program are `UCI_EngineAbout` (for which there is no equivalent `SetOption` command) and `Ponder`.
 
