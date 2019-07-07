@@ -46,13 +46,18 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
       val input = args.mkString(" ").toLowerCase
       val maybeMatch = pattern.findFirstMatchIn(input)
       val passedOption: Option[(String, Option[String])] = maybeMatch match {
-        case Some(patternMatch) if patternMatch.groupCount == 2 => Some(patternMatch.group(0), Some(patternMatch.group(1)))
-        case Some(patternMatch) => Some(patternMatch.group(0), None)
+        case Some(patternMatch) if patternMatch.groupCount == 2 => Some(patternMatch.group(1), Some(patternMatch.group(2)))
+        case Some(patternMatch) => Some(patternMatch.group(1), None)
         case _ => None
       }
+      log.debug("processing setoption, passedOption = {}", passedOption)
       val newOptions = passedOption match {
-        case Some(("ponder", Some("true"))) => options.copy(ponder = true)
-        case Some(("ponder", Some("false"))) => options.copy(ponder = false)
+        case Some(("ponder", Some("true"))) =>
+          if (options.debug) out("info ponder option is now true")
+          options.copy(ponder = true)
+        case Some(("ponder", Some("false"))) =>
+          if (options.debug) out("info ponder option is now false")
+          options.copy(ponder = false)
         case Some(("ponder", _)) =>
           warning("wrong parameter for command ponder, expected true or false", options.debug)
           options

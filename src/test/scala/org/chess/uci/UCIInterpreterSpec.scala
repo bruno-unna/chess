@@ -62,7 +62,7 @@ class UCIInterpreterSpec
       Thread.sleep(1.seconds.toMillis)
       builder.clear
       interpreter ! Command(Debug, List("off"))
-      Thread.sleep(2.seconds.toMillis)
+      Thread.sleep(200)
       assertResult("")(builder.result)
       interpreter ! Command(Quit, Nil)
     }
@@ -71,7 +71,12 @@ class UCIInterpreterSpec
       val interpreter = system.actorOf(UCIInterpreter.props(captureString))
       interpreter ! Start
       interpreter ! Command(UCI, Nil)
-      interpreter ! Command(SetOption, List("true"))
+      interpreter ! Command(Debug, List("on"))
+      Thread.sleep(100)
+      builder.clear
+      interpreter ! Command(SetOption, List("name", "ponder", "value", "true"))
+      Thread.sleep(200)
+      assertResult("info ponder option is now true")(builder.result)
     }
 
   }
