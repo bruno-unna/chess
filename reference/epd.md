@@ -128,4 +128,4 @@ The en passant target square is specified after a double push of a pawn, no matt
 * [40H Chess Tools and Utilities](http://40h.000webhostapp.com/) by Norman Pollock » Portable Game Notation
 * [Chess-Tools/epd2uci.py at master · Mk-Chan/Chess-Tools · GitHub](https://github.com/Mk-Chan/Chess-Tools/blob/master/epd2uci.py) by Manik Charan » Python, python-chess 
 
-Original source of this document: [chessprogramming.wikispaces.com](https://chessprogramming.wikispaces.com/Extended+Position+Description)
+Original source of this document: https://www.chessprogramming.org/Extended_Position_Description

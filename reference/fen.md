@@ -109,4 +109,4 @@ FEN strings of Starting Position and after `1.e4 c5 2.Nf3`:
 * [Chessforeva: 3D chess diagram from FEN](http://chessforeva.blogspot.de/2009/10/3d-chess-diagram-from-fen.html) » 3D Graphics Board
 * [Fen2eps](http://fen2eps.sourceforge.net/) by Dirk Baechle <ref>[Encapsulated PostScript from Wikipedia](https://en.wikipedia.org/wiki/Encapsulated_PostScript)</ref>
 
-Original source of this document: [chessprogramming.wikispaces.com](https://chessprogramming.wikispaces.com/Forsyth-Edwards+Notation)
+Original source of this document: https://www.chessprogramming.org/Forsyth-Edwards_Notation

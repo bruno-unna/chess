@@ -1,5 +1,7 @@
 # Portable Game Notation (PGN)
 
+Original source of this document: https://en.wikipedia.org/wiki/Portable_Game_Notation
+
 **Portable Game Notation** (PGN) is a plain text computer-processible format for recording chess games (both the moves and related data), supported by many chess programs.
 
 ## History

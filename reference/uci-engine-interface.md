@@ -457,3 +457,5 @@ Castling is different in Chess960 and the white king move when castling short is
 In EPD and FEN position strings specifying the castle rights with w and q is not enough as there could be more than one rook on the right or left side of the king. This is why the castle rights are specified with the letter of the castle rook's line. Upper case letters for white's and lower case letters for black's castling rights. Example: The normal chess position would be:
 
     rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w AHah -
+
+Original source of this document: https://www.chessprogramming.org/UCI

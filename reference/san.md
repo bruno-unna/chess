@@ -35,4 +35,4 @@ Due to the most compact representation, considering ambiguities concerning the o
 With the Chess Engine Communication Protocol version 2, one can use the feature command to select SAN as move format for both input and output .
 
 
-Original source of this document: [chessprogramming.wikispaces.com](https://chessprogramming.wikispaces.com/Algebraic+Chess+Notation#Standard%20Algebraic%20Notation%20(SAN))
+Original source of this document: https://www.chessprogramming.org/Algebraic_Chess_Notation#Standard_Algebraic_Notation_.28SAN.29
