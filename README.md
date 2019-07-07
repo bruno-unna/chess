@@ -55,6 +55,14 @@ The licensing model of this program (GPL-3.0) makes the use of the `copyprotecti
 
 Currently, the only options supported by the program are `UCI_EngineAbout` (for which there is no equivalent `SetOption` command) and `Ponder`.
 
+## Position representation
+
+There are several standards for the representation of positions in chess. The two most commonly used are:
+- [Forsyth-Edwards Notation](reference/fen.md) (FEN). It is very popular, and is used by UCI
+- [Extended Position Description](reference/epd.md) (EPD) Richer than FEN and extensible, but not as widely adopted.
+
+Due to the fact that UCI uses FEN, this program implements it instead of EPD.
+
 ## Computational model
 
 ## References
