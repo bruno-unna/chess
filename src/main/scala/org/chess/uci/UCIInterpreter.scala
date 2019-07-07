@@ -20,8 +20,10 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
   // For long term operations, this signals that an ok response is pending
   var readyOkPending = false
 
+  def info(msg: String, sendToClient: Boolean): Unit = if (sendToClient) out("info " + msg)
+
   def warning(msg: String, sendToClient: Boolean): Unit = {
-    if (sendToClient) out("warning: " + msg)
+    info("warning: " + msg, sendToClient)
     log.warning(msg)
   }
 
@@ -53,10 +55,10 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
       log.debug("processing setoption, passedOption = {}", passedOption)
       val newOptions = passedOption match {
         case Some(("ponder", Some("true"))) =>
-          if (options.debug) out("info ponder option is now true")
+          info("ponder option is now true", options.debug)
           options.copy(ponder = true)
         case Some(("ponder", Some("false"))) =>
-          if (options.debug) out("info ponder option is now false")
+          info("ponder option is now false", options.debug)
           options.copy(ponder = false)
         case Some(("ponder", _)) =>
           warning("wrong parameter for command ponder, expected true or false", options.debug)
@@ -102,7 +104,7 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
 
   when(Dead) {
     case Event(event, _) =>
-      log.warning("in Dead state, impossible event {} was received", event.toString)
+      log.error("in Dead state, impossible event {} was received", event.toString)
       stay
   }
 
@@ -114,12 +116,12 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
       val newOptions = if (args.exists(_.toLowerCase == "on")) options.copy(debug = true)
       else if (args.exists(_.toLowerCase == "off")) options.copy(debug = false)
       else {
-        log.warning("invalid input to command debug (should be on or off)")
+        warning("invalid input to command debug (should be on or off)", options.debug)
         options
       }
-      if (newOptions.debug) out("info debug is now on")
+      info("debug is now on", newOptions.debug)
       stay using newOptions
-    case Event(Command(IsReady, _), _) =>
+    case Event(Command(IsReady, _), options) =>
       log.error("command isReady is not handled in state {} but should", stateName)
       stay
     case Event(event, data) if event.isInstanceOf[Command] =>
