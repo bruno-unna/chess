@@ -1,6 +1,8 @@
 package org.chess.uci
 
-import akka.actor.{LoggingFSM, Props}
+import akka.actor.{ActorRef, LoggingFSM, Props}
+import org.chess.position
+import org.chess.position.Fen
 import org.chess.uci.Keyword._
 import org.chess.uci.State._
 import org.chess.uci.UCIInterpreter._
@@ -18,7 +20,9 @@ import org.chess.uci.UCIInterpreter._
 class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
 
   // For long term operations, this signals that an ok response is pending
-  var readyOkPending = false
+  var readyOkPending: Boolean = false
+
+  var board: Option[ActorRef] = None
 
   def info(msg: String, sendToClient: Boolean): Unit = if (sendToClient) out("info " + msg)
 
@@ -72,7 +76,18 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
       // TODO provoke the reset of the system (make sure a `GameReset` command is sent at the end).
       goto(GameResetting)
     case Event(Command(Position, args), _) =>
+      Fen(args).fold(
+        e => warning(e.getMessage, sendToClient = true),
+        fen => {
+          board foreach (_ ! "die")
+          board = Some(context actorOf position.Position.props(fen))
+        }
+      )
+      val moves = args dropWhile (_ != "moves") drop 1
+
+
       // TODO setup the given position on the internal board and play the given moves
+      //      board = Chess.system.actorOf(Position.props(fen, moves), fen.toActorName)
       stay
     case Event(Command(Go, args), _) =>
       // TODO start thinking. When done, send a `ThinkingStopped` command.
