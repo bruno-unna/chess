@@ -20,7 +20,7 @@ object CastlingAbility {
         whiteQueenSide = castlingString.contains("Q"),
         blackKingSide = castlingString.contains("k"),
         blackQueenSide = castlingString.contains("q")))
-    case _ => Failure(new IllegalArgumentException)
+    case _ => Failure(new IllegalArgumentException("can't interpret the castling ability string"))
   }
 
 }
