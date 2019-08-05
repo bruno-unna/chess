@@ -7,12 +7,13 @@ import akka.actor.{Actor, ActorLogging, Props}
   * information regarding whose's turn it is, castling abilities, en-passant target square. There should be
   * no more than one instance of this actor for each position of the board.
   */
-class Position(fen: String) extends Actor with ActorLogging {
+class Position(fen: Fen) extends Actor with ActorLogging {
   override def receive: Receive = {
+    case "die" => // TODO die!
     case _ =>
   }
 }
 
 object Position {
-  def props(fen: String): Props = Props(new Position(fen))
+  def props(fen: Fen): Props = Props(new Position(fen))
 }
