@@ -15,14 +15,16 @@ object Fen {
 
   def apply(fenElements: List[String]): Try[Fen] = {
     fenElements match {
-      case "startpos" :: _ => Success(Fen.startpos)
-      case "fen" :: piecePlacementStr :: sideToMoveStr :: castlingAbilityStr :: enPassantTargetSquareStr :: halfmoveClockStr :: fullmoveCounterStr :: _ =>
+      case "startpos" :: moves => Success(Fen.startpos)
+      case "fen" :: piecePlacementStr :: sideToMoveStr :: castlingAbilityStr :: enPassantTargetSquareStr :: halfmoveClockStr :: fullmoveCounterStr :: moves =>
         for {
           sideToMove <- Side(sideToMoveStr)
           castlingAbility <- CastlingAbility(castlingAbilityStr)
           halfmoveClock <- Try(halfmoveClockStr.toInt)
           fullmoveCounter <- Try(fullmoveCounterStr.toInt)
-        } yield Fen(piecePlacementStr, sideToMove, castlingAbility, enPassantTargetSquareStr, halfmoveClock, fullmoveCounter)
+          fen = Fen(piecePlacementStr, sideToMove, castlingAbility, enPassantTargetSquareStr, halfmoveClock, fullmoveCounter)
+//          fen.applyMoves(moves.drop 1)
+        } yield fen
       case _ => Failure(new IllegalArgumentException("can't interpret the FEN string"))
     }
   }

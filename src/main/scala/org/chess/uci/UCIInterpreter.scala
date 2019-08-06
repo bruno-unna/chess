@@ -7,6 +7,8 @@ import org.chess.uci.Keyword._
 import org.chess.uci.State._
 import org.chess.uci.UCIInterpreter._
 
+import scala.language.postfixOps
+
 /** Finite states machine for interpreting the UCI protocol.
   *
   * The machine starts in the [[org.chess.uci.State.Idle]] state, from which only
@@ -83,11 +85,6 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
           board = Some(context actorOf position.Position.props(fen))
         }
       )
-      val moves = args dropWhile (_ != "moves") drop 1
-
-
-      // TODO setup the given position on the internal board and play the given moves
-      //      board = Chess.system.actorOf(Position.props(fen, moves), fen.toActorName)
       stay
     case Event(Command(Go, args), _) =>
       // TODO start thinking. When done, send a `ThinkingStopped` command.
