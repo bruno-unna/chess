@@ -2,7 +2,6 @@ package org.chess.uci
 
 import akka.actor.{ActorRef, LoggingFSM, Props}
 import org.chess.position
-import org.chess.position.Fen
 import org.chess.uci.Keyword._
 import org.chess.uci.State._
 import org.chess.uci.UCIInterpreter._
@@ -78,11 +77,14 @@ class UCIInterpreter(out: String => Unit) extends LoggingFSM[State, Options] {
       // TODO provoke the reset of the system (make sure a `GameReset` command is sent at the end).
       goto(GameResetting)
     case Event(Command(Position, args), _) =>
-      Fen(args).fold(
-        e => warning(e.getMessage, sendToClient = true),
-        fen => {
+      board = position.Position.tryProps(args).fold(
+        error => {
+          warning(error.getMessage, sendToClient = true)
+          None
+        },
+        props => {
           board foreach (_ ! "die")
-          board = Some(context actorOf position.Position.props(fen))
+          Some(context actorOf props) // TODO set the actor's name (possibly according to the FEN)
         }
       )
       stay
