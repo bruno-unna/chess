@@ -9,7 +9,8 @@ import scala.util.Try
   * information regarding whose's turn it is, castling abilities, en-passant target square. There should be
   * no more than one instance of this actor for each position of the board.
   */
-class Position(fen: Fen) extends Actor with ActorLogging {
+class Position(fen: Fen, moves: List[String]) extends Actor with ActorLogging {
+  // TODO apply the moves to the board
   override def receive: Receive = {
     case "die" => // TODO die!
     case _ =>
@@ -17,5 +18,8 @@ class Position(fen: Fen) extends Actor with ActorLogging {
 }
 
 object Position {
-  def tryProps(args: List[String]): Try[Props] = ???
+  def tryProps(args: List[String]): Try[Props] = for {
+    fen <- Fen(args)
+    moves = args dropWhile (_ != "moves") drop 1
+  } yield Props(new Position(fen, moves))
 }
