@@ -10,16 +10,23 @@ import scala.util.Try
   * no more than one instance of this actor for each position of the board.
   */
 class Position(fen: Fen, moves: List[String]) extends Actor with ActorLogging {
+
   // TODO apply the moves to the board
+
   override def receive: Receive = {
     case "die" => // TODO die!
     case _ =>
   }
+
 }
 
 object Position {
+
+  case object getBoard
+
   def tryProps(args: List[String]): Try[Props] = for {
     fen <- Fen(args)
     moves = args dropWhile (_ != "moves") drop 1
   } yield Props(new Position(fen, moves))
+
 }
