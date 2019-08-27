@@ -10,9 +10,9 @@ lazy val enumeratumVersion = "1.5.13"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-  "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
-  "org.scalatest" %% "scalatest" % scalaTestVersion,
   "com.beachape" %% "enumeratum" % enumeratumVersion,
+  "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
+  "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
 )
 
 enablePlugins(JavaAppPackaging)
